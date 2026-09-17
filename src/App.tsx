@@ -58,7 +58,7 @@ export default function App() {
                 <Cake className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-800 leading-tight">CakeCost</h1>
+                <h1 className="text-lg font-bold text-gray-800 leading-tight">Confeitaria</h1>
                 <p className="text-xs text-gray-400 leading-tight">Controle de Custos</p>
               </div>
             </div>
@@ -151,7 +151,7 @@ export default function App() {
       <footer className="border-t border-gray-100 bg-white mt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
           <p className="text-center text-sm text-gray-400">
-            CakeCost © 2024 — Sistema de Controle de Custos para Confeitaria
+            © 2024 — Sistema de Controle de Custos para Confeitaria
           </p>
         </div>
       </footer>

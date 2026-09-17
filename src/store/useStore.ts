@@ -129,7 +129,7 @@ export const useStore = create<AppState>()(
       },
     }),
     {
-      name: 'cake-business-storage',
+      name: 'confeitaria-storage',
     }
   )
 );
