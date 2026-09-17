@@ -10,6 +10,7 @@ import {
   BarChart3,
   AlertCircle,
 } from 'lucide-react';
+import Cake3D from './Cake3D';
 import {
   BarChart,
   Bar,
@@ -75,6 +76,71 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Banner 3D de Boas-vindas */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-400 via-emerald-500 to-teal-600 p-8 shadow-2xl"
+      >
+        {/* Efeito de brilho no fundo */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-yellow-300 rounded-full blur-3xl translate-x-1/3 translate-y-1/3" />
+        </div>
+
+        <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+          {/* Texto */}
+          <div className="text-white space-y-3">
+            <motion.h2
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-4xl md:text-5xl font-bold leading-tight"
+            >
+              Bem-vindo ao seu
+              <br />
+              <span className="bg-gradient-to-r from-yellow-200 to-orange-200 bg-clip-text text-transparent">
+                Controle de Custos
+              </span>
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+              className="text-green-50 text-lg max-w-md"
+            >
+              Gerencie seus insumos, calcule preços e maximize seus lucros com análises inteligentes.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7 }}
+              className="flex gap-3 pt-2"
+            >
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
+                <p className="text-xs text-green-50">💡 Dica</p>
+                <p className="text-sm text-white font-medium">Mire em 40% de margem</p>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/30">
+                <p className="text-xs text-green-50">🎯 Meta</p>
+                <p className="text-sm text-white font-medium">Preço = Custo ÷ 0,60</p>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Bolo 3D */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.8, type: 'spring' }}
+            className="flex justify-center lg:justify-end"
+          >
+            <Cake3D />
+          </motion.div>
+        </div>
+      </motion.div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <motion.div

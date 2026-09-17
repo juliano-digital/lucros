@@ -14,6 +14,7 @@ import Ingredients from './components/Ingredients';
 import Recipes from './components/Recipes';
 import Sales from './components/Sales';
 import SalesSimulator from './components/SalesSimulator';
+import Cake3D from './components/Cake3D';
 
 type Tab = 'dashboard' | 'ingredients' | 'recipes' | 'sales' | 'simulator';
 
