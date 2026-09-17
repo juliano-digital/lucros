@@ -8,6 +8,7 @@ import {
   Cake,
   Target,
   BarChart3,
+  AlertCircle,
 } from 'lucide-react';
 import {
   BarChart,
@@ -26,7 +27,7 @@ import { useStore } from '../store/useStore';
 const COLORS = ['#f97316', '#fb923c', '#fdba74', '#fed7aa', '#ffedd5', '#ea580c'];
 
 export default function Dashboard() {
-  const { recipes, sales, getRecipeCost, getRecipeProfit, getRecipeProfitMargin } = useStore();
+  const { recipes, sales, getRecipeCost, getRecipeProfit, getRecipeProfitMargin, getSuggestedPriceForMargin } = useStore();
 
   const stats = useMemo(() => {
     const totalRevenue = sales.reduce((acc, s) => acc + s.totalRevenue, 0);
@@ -303,6 +304,75 @@ export default function Dashboard() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Análise de Preço para 40% de Margem */}
+      {recipeAnalysis.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1 }}
+          className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+        >
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <Target className="w-5 h-5 text-green-600" />
+            Análise de Preço para 40% de Margem
+          </h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-100">
+                  <th className="text-left py-3 px-4 text-gray-500 font-medium">Produto</th>
+                  <th className="text-right py-3 px-4 text-gray-500 font-medium">Custo Total</th>
+                  <th className="text-right py-3 px-4 text-gray-500 font-medium">Preço Atual</th>
+                  <th className="text-right py-3 px-4 text-gray-500 font-medium">Preço Sugerido (40%)</th>
+                  <th className="text-right py-3 px-4 text-gray-500 font-medium">Diferença</th>
+                  <th className="text-right py-3 px-4 text-gray-500 font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recipes.map((recipe) => {
+                  const suggested = getSuggestedPriceForMargin(recipe, 40);
+                  const difference = suggested - recipe.sellingPrice;
+                  const needsAdjustment = difference > 0.01;
+
+                  return (
+                    <tr key={recipe.id} className="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+                      <td className="py-3 px-4 font-medium text-gray-800">{recipe.name}</td>
+                      <td className="py-3 px-4 text-right text-red-600">{formatCurrency(getRecipeCost(recipe))}</td>
+                      <td className="py-3 px-4 text-right text-gray-800">{formatCurrency(recipe.sellingPrice)}</td>
+                      <td className="py-3 px-4 text-right text-green-700 font-semibold">{formatCurrency(suggested)}</td>
+                      <td className="py-3 px-4 text-right">
+                        {needsAdjustment ? (
+                          <span className="text-orange-600 font-medium">+{formatCurrency(difference)}</span>
+                        ) : (
+                          <span className="text-green-600">✓ Ok</span>
+                        )}
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        {needsAdjustment ? (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
+                            Ajustar preço
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            Ideal
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4 p-4 bg-green-50 rounded-xl">
+            <p className="text-sm text-green-800">
+              <strong>💡 Dica:</strong> Para ter 40% de margem de lucro, o preço de venda deve ser calculado pela fórmula:
+              <strong> Preço = Custo ÷ 0,60</strong>. Isso garante que 40% do preço seja lucro e 60% cubra os custos.
+            </p>
           </div>
         </motion.div>
       )}
