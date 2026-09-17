@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Edit2, Trash2, X, Cake, Search, Calculator } from 'lucide-react';
+import { Plus, Edit2, Trash2, X, Cake, Search, Calculator, Target, CheckCircle, AlertTriangle } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import type { Recipe, RecipeIngredient } from '../types';
 
@@ -15,6 +15,8 @@ export default function Recipes() {
     getRecipeCostPerUnit,
     getRecipeProfit,
     getRecipeProfitMargin,
+    getSuggestedPriceForMargin,
+    getSuggestedPricePerUnitForMargin,
   } = useStore();
 
   const [showForm, setShowForm] = useState(false);
@@ -443,6 +445,66 @@ export default function Recipes() {
                     <p className="text-lg font-bold text-purple-700">{getRecipeProfitMargin(detailRecipe).toFixed(1)}%</p>
                   </div>
                 </div>
+
+                {/* Preço sugerido para 40% de margem */}
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Target className="w-5 h-5 text-green-600" />
+                    <h4 className="font-semibold text-green-800">Preço Sugerido para 40% de Margem</h4>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-700">Preço total sugerido:</span>
+                      <span className="text-xl font-bold text-green-700">
+                        {formatCurrency(getSuggestedPriceForMargin(detailRecipe, 40))}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-700">Preço por unidade:</span>
+                      <span className="text-lg font-semibold text-green-600">
+                        {formatCurrency(getSuggestedPricePerUnitForMargin(detailRecipe, 40))}
+                      </span>
+                    </div>
+                    {(() => {
+                      const suggested = getSuggestedPriceForMargin(detailRecipe, 40);
+                      const difference = suggested - detailRecipe.sellingPrice;
+                      if (difference > 0.01) {
+                        return (
+                          <div className="mt-3 pt-3 border-t border-green-300">
+                            <div className="flex items-center gap-2 text-sm">
+                              <AlertTriangle className="w-4 h-4 text-orange-600" />
+                              <span className="text-orange-700">
+                                Aumente o preço em <strong>{formatCurrency(difference)}</strong> para atingir 40% de margem
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      } else if (difference < -0.01) {
+                        return (
+                          <div className="mt-3 pt-3 border-t border-green-300">
+                            <div className="flex items-center gap-2 text-sm">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <span className="text-green-700">
+                                Excelente! Sua margem já está acima de 40%
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <div className="mt-3 pt-3 border-t border-green-300">
+                            <div className="flex items-center gap-2 text-sm">
+                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <span className="text-green-700">
+                                Perfeito! Você já está com 40% de margem
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      }
+                    })()}
+                  </div>
+                </div>
               </div>
             </motion.div>
           </motion.div>
@@ -457,6 +519,10 @@ export default function Recipes() {
             const margin = getRecipeProfitMargin(recipe);
             const costPerUnit = getRecipeCostPerUnit(recipe);
             const pricePerUnit = recipe.yields > 0 ? recipe.sellingPrice / recipe.yields : recipe.sellingPrice;
+            const suggestedPrice = getSuggestedPriceForMargin(recipe, 40);
+            const suggestedPricePerUnit = getSuggestedPricePerUnitForMargin(recipe, 40);
+            const priceDifference = suggestedPrice - recipe.sellingPrice;
+            const needsAdjustment = priceDifference > 0.01;
 
             return (
               <motion.div
@@ -532,6 +598,36 @@ export default function Recipes() {
                     }`}>
                       {margin.toFixed(1)}%
                     </span>
+                  </div>
+
+                  {/* Preço sugerido para 40% de margem */}
+                  <div className="mt-3 pt-3 border-t border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg p-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Target className="w-4 h-4 text-green-600" />
+                      <span className="text-xs font-semibold text-green-700">Preço para 40% de margem</span>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-600">Preço sugerido:</span>
+                        <span className="font-bold text-green-700">{formatCurrency(suggestedPrice)}</span>
+                      </div>
+                      <div className="flex justify-between text-xs">
+                        <span className="text-gray-600">Por unidade:</span>
+                        <span className="font-medium text-green-600">{formatCurrency(suggestedPricePerUnit)}</span>
+                      </div>
+                      {needsAdjustment && (
+                        <div className="flex justify-between text-xs pt-1 border-t border-green-200">
+                          <span className="text-gray-600">Aumentar:</span>
+                          <span className="font-bold text-orange-600">+{formatCurrency(priceDifference)}</span>
+                        </div>
+                      )}
+                      {!needsAdjustment && recipe.sellingPrice > 0 && (
+                        <div className="flex items-center gap-1 text-xs text-green-600 pt-1">
+                          <CheckCircle className="w-3 h-3" />
+                          <span>Preço adequado!</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </motion.div>

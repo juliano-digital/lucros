@@ -28,9 +28,10 @@ interface AppState {
   getRecipeCostPerUnit: (recipe: Recipe) => number;
   getRecipeProfit: (recipe: Recipe) => number;
   getRecipeProfitMargin: (recipe: Recipe) => number;
-  getBreakEvenUnits: (recipe: Recipe, monthlyFixedCosts: number) => number;
-}
-
+      getBreakEvenUnits: (recipe: Recipe, monthlyFixedCosts: number) => number;
+      getSuggestedPriceForMargin: (recipe: Recipe, marginPercent: number) => number;
+      getSuggestedPricePerUnitForMargin: (recipe: Recipe, marginPercent: number) => number;
+    }
 export const useStore = create<AppState>()(
   persist(
     (set, get) => ({
@@ -127,9 +128,23 @@ export const useStore = create<AppState>()(
         if (contributionMargin <= 0) return Infinity;
         return Math.ceil(monthlyFixedCosts / contributionMargin);
       },
+
+      getSuggestedPriceForMargin: (recipe, marginPercent) => {
+        const totalCost = get().getRecipeCost(recipe);
+        const marginDecimal = marginPercent / 100;
+        // Fórmula: PV = Custo / (1 - margem)
+        // Para 40% de margem: PV = Custo / 0.60
+        return totalCost / (1 - marginDecimal);
+      },
+
+      getSuggestedPricePerUnitForMargin: (recipe, marginPercent) => {
+        const costPerUnit = get().getRecipeCostPerUnit(recipe);
+        const marginDecimal = marginPercent / 100;
+        return costPerUnit / (1 - marginDecimal);
+      },
     }),
     {
-      name: 'cake-business-storage',
+      name: 'confeitaria-storage',
     }
   )
 );
